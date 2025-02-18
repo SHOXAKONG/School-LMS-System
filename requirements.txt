@@ -1,0 +1,9 @@
+crud~=0.1
+fastapi~=0.115.8
+SQLAlchemy~=2.0.38
+python-jose~=3.3.0
+passlib~=1.7.4
+spglib~=2.5.0
+auth~=0.5.3
+pydantic~=2.10.6
+starlette~=0.45.3
