@@ -1,9 +1,8 @@
-from fake_database import *
 from datetime import datetime, timedelta
+from fake_database import *
 from middleware import *
 
 
-# --- Authentication Endpoints ---
 @app.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = fake_users_db.get(form_data.username)
@@ -105,8 +104,11 @@ def get_students(current_user: User = Depends(get_current_user)):
     if current_user.role == Role.STUDENT:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
     if current_user.role == Role.TEACHER:
+        teacher_id = teacher_mapping.get(current_user.username)
+        if teacher_id is None:
+            raise HTTPException(status_code=404, detail="Teacher not found")
         teacher = next(
-            (t for t in fake_teachers if t.name == current_user.username and t.branch_id == current_user.branch_id),
+            (t for t in fake_teachers if t.id == teacher_id and t.branch_id == current_user.branch_id),
             None
         )
         if teacher:
@@ -116,6 +118,7 @@ def get_students(current_user: User = Depends(get_current_user)):
         else:
             raise HTTPException(status_code=404, detail="Teacher not found")
     return [s for s in fake_students if s.branch_id == current_user.branch_id]
+
 
 
 @student_router.put("/{student_id}")
